@@ -16,7 +16,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         kapt {
-            arguments {arg("room.schemaLocation", "$projectDir/schemas")}
+            arguments { arg("room.schemaLocation", "$projectDir/schemas") }
         }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -81,5 +81,7 @@ dependencies {
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    //interceptor
+    implementation(libs.logging.interceptor)
 }
