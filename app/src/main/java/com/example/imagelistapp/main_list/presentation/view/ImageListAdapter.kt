@@ -1,5 +1,6 @@
 package com.example.imagelistapp.main_list.presentation.view
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.imagelistapp.R
 import com.example.imagelistapp.main_list.domain.entity.Image
 
-class ImageListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var productsList = listOf<Image>()
+class ImageListAdapter(
+    private val faveClickListener: (Image, ByteArray) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var imageList = listOf<Image>()
     private var showLoading: Boolean = false
     override fun getItemViewType(position: Int): Int {
-        return if (position == productsList.size) {
+        return if (position == imageList.size) {
             LoadingViewHolder.VIEW_TYPE
         } else {
             ImageListViewHolder.VIEW_TYPE
@@ -24,7 +27,8 @@ class ImageListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return when (viewType) {
             ImageListViewHolder.VIEW_TYPE -> ImageListViewHolder(
                 LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_image, parent, false)
+                    .inflate(R.layout.item_image, parent, false),
+                faveClickListener
             )
 
             LoadingViewHolder.VIEW_TYPE -> LoadingViewHolder(
@@ -34,34 +38,27 @@ class ImageListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 )
             )
 
-            ErrorViewHolder.VIEW_TYPE -> ErrorViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_error,
-                    parent, false
-                )
-            )
-
             else -> throw IllegalStateException("Not found view type")
         }
     }
 
-    override fun getItemCount(): Int = productsList.size + if (showLoading) 1 else 0
-
-
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (position == productsList.size || holder !is ImageListViewHolder) return
-        holder.bindData(productsList[position])
+        if (position == imageList.size || holder !is ImageListViewHolder) return
+        val image = imageList[position]
+        holder.bindData(image)
     }
+
+    override fun getItemCount(): Int = imageList.size + if (showLoading) 1 else 0
 
     fun bindProductList(newList: List<Image>, showLoading: Boolean = false) {
         val previousLoading = this.showLoading
         this.showLoading = showLoading
         if (!showLoading && previousLoading) {
-            notifyItemRemoved(productsList.size)
+            notifyItemRemoved(imageList.size)
         }
-        val diffUtil = DiffUtilCallback(productsList, newList)
+        val diffUtil = DiffUtilCallback(imageList, newList)
         val diffResults = DiffUtil.calculateDiff(diffUtil)
-        productsList = newList
+        imageList = newList
         diffResults.dispatchUpdatesTo(this)
     }
 }
@@ -72,15 +69,27 @@ class LoadingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 }
 
-class ErrorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    companion object {
-        const val VIEW_TYPE = 3
-    }
-}
+class ImageListViewHolder(
+    itemView: View,
+    private val faveClickListener: (Image, ByteArray) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
 
-class ImageListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val imageView = itemView.findViewById<ImageView>(R.id.image)
+    private val imageView: ImageView = itemView.findViewById(R.id.image)
+    private val favoriteIcon: ImageView = itemView.findViewById(R.id.favorite)
+
+
     fun bindData(image: Image) {
+        favoriteIcon.setColorFilter(
+            if (image.isFavorite) {
+                Color.RED
+            } else {
+                Color.WHITE
+            }
+        )
+        favoriteIcon.setOnClickListener {
+            val bitmap = imageView.getBitmapArray()
+            faveClickListener(image, bitmap)
+        }
         imageView.loadImage(image)
     }
 

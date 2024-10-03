@@ -4,4 +4,8 @@
     <string name="no_images">Нет изображений</string>
     <string name="something_wrong">Что-то пошло не так</string>
     <string name="repeat_request">Перезагрузить</string>
+    <string name="fave_failed">Не удалось изменить избранное</string>
+    <string name="main_screen">Главный экран</string>
+    <string name="favorites_screen">Избранное</string>
+    <string name="favorites">Favorites</string>
 </resources>

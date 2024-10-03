@@ -19,18 +19,15 @@ interface ApiInterface {
     companion object {
         private const val BASE_URL = "https://picsum.photos/v2/"
         private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-        fun create(): ApiInterface {
+        fun createRetrofit(): Retrofit {
             val client = OkHttpClient.Builder()
                 .addInterceptor(logging)
                 .build()
-            val retrofit = Retrofit.Builder()
+            return Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .baseUrl(BASE_URL)
                 .build()
-            return retrofit
-                .create(ApiInterface::class.java)
-
         }
     }
 }

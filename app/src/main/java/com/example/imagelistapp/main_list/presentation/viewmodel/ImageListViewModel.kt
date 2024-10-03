@@ -2,19 +2,28 @@ package com.example.imagelistapp.main_list.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.imagelistapp.R
 import com.example.imagelistapp.main_list.domain.Repository
+import com.example.imagelistapp.main_list.domain.ToggleFaveUseCase
 import com.example.imagelistapp.main_list.domain.entity.Image
+import com.example.imagelistapp.main_list.domain.entity.toggleFavorite
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ImageListViewModel @Inject constructor(
-    private val repository: Repository
+    private val repository: Repository,
+    private val toggleFaveUseCase: ToggleFaveUseCase
 ) : ViewModel() {
     val state get() = _state.asStateFlow()
     private val _state = MutableStateFlow<ImageListState>(ImageListState.IsEmpty)
+
+    val event get() = _event.asSharedFlow()
+    private val _event = MutableSharedFlow<ImageListOneTimeEvents>()
 
     private var nextPage = INITIAL_PAGE
     private var hasMoreItems = true
@@ -24,12 +33,42 @@ class ImageListViewModel @Inject constructor(
         loadInitial()
     }
 
-    fun onAction(action: Action) {
+    fun onAction(action: ImageListActions) {
         when (action) {
-            Action.OnScrolledToEnd -> loadNext()
-            Action.Reload -> loadInitial()
+            ImageListActions.OnScrolledToEnd -> loadNext()
+            ImageListActions.Reload -> loadInitial()
+            is ImageListActions.FavoriteIconClicked -> faveToggle(action.image, action.bitmap)
         }
 
+    }
+
+    private fun faveToggle(image: Image, bitmap: ByteArray) {
+        viewModelScope.launch {
+            runCatching {
+                toggleFaveUseCase.toggleFave(image, bitmap)
+            }.fold(
+                onSuccess = {
+                    onFaveChanged(image)
+
+                },
+                onFailure = {
+                    _event.emit(ImageListOneTimeEvents.MakeToast(R.string.fave_failed))
+                }
+            )
+        }
+    }
+
+    private fun onFaveChanged(image: Image) {
+        val currentState = state.value as? ImageListState.ImageList
+            ?: return
+        val updatedList = currentState.list.map {
+            if (it != image) {
+                it
+            } else {
+                it.toggleFavorite()
+            }
+        }
+        _state.value = currentState.copy(list = updatedList)
     }
 
     private fun loadNext() {

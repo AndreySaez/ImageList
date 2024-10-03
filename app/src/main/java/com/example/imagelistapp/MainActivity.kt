@@ -2,6 +2,7 @@ package com.example.imagelistapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.imagelistapp.main_list.domain.entity.DataMode
 import com.example.imagelistapp.main_list.presentation.view.ImageListFragment
 
 class MainActivity : AppCompatActivity() {
@@ -10,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .add(R.id.main, ImageListFragment())
+                .add(R.id.main, ImageListFragment.create(DataMode.MAIN))
                 .commit()
         }
     }

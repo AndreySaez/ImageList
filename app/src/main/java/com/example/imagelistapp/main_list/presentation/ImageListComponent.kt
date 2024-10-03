@@ -1,5 +1,6 @@
 package com.example.imagelistapp.main_list.presentation
 
+import android.content.Context
 import com.example.imagelistapp.main_list.data.DataModule
 import com.example.imagelistapp.main_list.domain.entity.DataMode
 import com.example.imagelistapp.main_list.presentation.view.ImageListFragment
@@ -16,7 +17,10 @@ interface ImageListComponent {
 
     @Component.Factory
     interface Factory {
-        fun create(@BindsInstance dataMode: DataMode): ImageListComponent
+        fun create(
+            @BindsInstance dataMode: DataMode,
+            @BindsInstance context: Context
+        ): ImageListComponent
     }
 
 }
