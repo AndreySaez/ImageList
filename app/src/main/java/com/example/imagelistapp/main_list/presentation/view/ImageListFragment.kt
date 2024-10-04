@@ -53,7 +53,7 @@ class ImageListFragment : Fragment(R.layout.fragment_image_list) {
         views.errorButton.setOnClickListener {
             viewModel.onAction(ImageListActions.Reload)
         }
-        val gridLayoutManager = GridLayoutManager(context, 2).apply {
+        val gridLayoutManager = GridLayoutManager(context, 3).apply {
             spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return when (imagesAdapter.getItemViewType(position)) {
@@ -64,6 +64,7 @@ class ImageListFragment : Fragment(R.layout.fragment_image_list) {
             }
         }
         views.recycler.apply {
+            addItemDecoration(SpacingItemDecorator(4))
             adapter = imagesAdapter
             layoutManager = gridLayoutManager
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
