@@ -8,8 +8,8 @@ import androidx.room.Query
 
 @Dao
 interface ImageListDao {
-    @Query("SELECT * FROM ${ImageRoomEntity.TABLE_NAME}")
-    suspend fun getFavoritesImageList(): List<ImageRoomEntity>
+    @Query("SELECT * FROM ${ImageRoomEntity.TABLE_NAME} LIMIT :limit OFFSET :offset")
+    suspend fun getFavoritesImageList(limit: Int, offset: Int): List<ImageRoomEntity>
 
     @Insert(entity = ImageRoomEntity::class, onConflict = OnConflictStrategy.REPLACE)
     suspend fun addImageToFavorite(image: ImageRoomEntity)

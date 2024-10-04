@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.imagelistapp.R
 import com.example.imagelistapp.main_list.domain.Repository
 import com.example.imagelistapp.main_list.domain.ToggleFaveUseCase
+import com.example.imagelistapp.main_list.domain.entity.DataMode
 import com.example.imagelistapp.main_list.domain.entity.Image
 import com.example.imagelistapp.main_list.domain.entity.toggleFavorite
 import kotlinx.coroutines.Job
@@ -144,7 +145,7 @@ class ImageListViewModel @Inject constructor(
 
     companion object {
         const val PAGE_SIZE = 20
-        const val INITIAL_PAGE = 1
+        const val INITIAL_PAGE = 0
     }
 }
 
