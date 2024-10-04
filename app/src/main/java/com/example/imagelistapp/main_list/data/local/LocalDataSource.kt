@@ -13,7 +13,7 @@ class LocalDataSource @Inject constructor(
 ) : DataSource {
     override suspend fun getImages(page: Int, limit: Int): List<Image> =
         withContext(Dispatchers.IO) {
-            imageListDao.getFavoritesImageList(offset = page * limit, limit = limit)
+            imageListDao.getFavoritesImageList(offset = (page - 1) * limit, limit = limit)
                 .map(mapper::toImage)
         }
 }
